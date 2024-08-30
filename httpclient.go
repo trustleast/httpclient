@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -95,15 +94,14 @@ func NewStore(fileSystemRoot string, opts ...Option) *Store {
 // CacheFetch tries to fetch the request from cache and falls back to remote if validations fail.
 // It returns a boolean indicating whether it received it from the cache or not.
 // It also returns a StoreFunc that should be called if the client wants to store the response in cache.
-func (s *Store) CacheFetch(ctx context.Context, r *http.Request, lastModified time.Time) (*http.Response, bool, StoreFunc, error) {
-	r = r.WithContext(ctx)
+func (s *Store) CacheFetch(r *http.Request, lastModified time.Time) (*http.Response, bool, StoreFunc, error) {
 	rsp, cached, storeFunc, err := s.internalCacheFetch(r, lastModified)
 	return rsp, cached, storeFunc, err
 }
 
 // CacheFetchAndStore is like CacheFetch but it immediately calls the store function after getting a response.
-func (s *Store) CacheFetchAndStore(ctx context.Context, r *http.Request, lastModified time.Time) (*http.Response, bool, error) {
-	rsp, cached, storeFunc, err := s.CacheFetch(ctx, r, lastModified)
+func (s *Store) CacheFetchAndStore(r *http.Request, lastModified time.Time) (*http.Response, bool, error) {
+	rsp, cached, storeFunc, err := s.CacheFetch(r, lastModified)
 	if err != nil {
 		return rsp, cached, err
 	}
@@ -119,7 +117,7 @@ func (s *Store) CacheFetchAndStore(ctx context.Context, r *http.Request, lastMod
 // It sets the lastModified time to 0, so it will always fetch from cache.
 // Be careful using this as you will never get updated results.
 func (s *Store) Do(r *http.Request) (*http.Response, error) {
-	rsp, _, storeFunc, err := s.CacheFetch(r.Context(), r, time.Time{})
+	rsp, _, storeFunc, err := s.CacheFetch(r, time.Time{})
 	if err != nil {
 		return rsp, err
 	}
