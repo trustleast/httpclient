@@ -1,7 +1,6 @@
 package httpclient
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"strings"
@@ -34,12 +33,11 @@ func TestStore(t *testing.T) {
 			body:       "hello, world",
 		}
 		store := NewStore(t.TempDir(), WithClient(dummyClient), WithMaxErrorVersion(2))
-		ctx := context.Background()
 
 		req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
 		require.NoError(t, err)
 
-		rsp, found, storeFunc, err := store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err := store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, rsp.StatusCode)
@@ -49,7 +47,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 1, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, rsp.StatusCode)
@@ -59,7 +57,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 1, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Now())
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Now())
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, rsp.StatusCode)
@@ -76,12 +74,11 @@ func TestStore(t *testing.T) {
 			body:       "hello, world",
 		}
 		store := NewStore(t.TempDir(), WithClient(dummyClient), WithMaxErrorVersion(2))
-		ctx := context.Background()
 
 		req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
 		require.NoError(t, err)
 
-		rsp, found, storeFunc, err := store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err := store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, rsp.StatusCode)
@@ -94,7 +91,7 @@ func TestStore(t *testing.T) {
 		req, err = http.NewRequest(http.MethodGet, "http://example2.com", nil)
 		require.NoError(t, err)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusOK, rsp.StatusCode)
@@ -111,12 +108,11 @@ func TestStore(t *testing.T) {
 			body:       "hello, world",
 		}
 		store := NewStore(t.TempDir(), WithClient(dummyClient), WithMaxErrorVersion(2))
-		ctx := context.Background()
 
 		req, err := http.NewRequest(http.MethodGet, "http://example.com", nil)
 		require.NoError(t, err)
 
-		rsp, found, storeFunc, err := store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err := store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -126,7 +122,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 1, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -136,7 +132,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 2, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -146,7 +142,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 3, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -156,7 +152,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 3, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Now())
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Now())
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -166,7 +162,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 4, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -176,7 +172,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 5, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
@@ -186,7 +182,7 @@ func TestStore(t *testing.T) {
 		require.Equal(t, "hello, world", string(data))
 		require.Equal(t, 6, dummyClient.requests)
 
-		rsp, found, storeFunc, err = store.CacheFetch(ctx, req, time.Time{})
+		rsp, found, storeFunc, err = store.CacheFetch(req, time.Time{})
 		require.NoError(t, storeFunc())
 		require.NoError(t, err)
 		require.Equal(t, http.StatusInternalServerError, rsp.StatusCode)
